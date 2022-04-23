@@ -1,51 +1,46 @@
 <?php
 Class Tournament
 {
-    private $name;
-    private $date;
-    private $players = Array();
+    private string $name;
+    private string $date;
+    private array $players;
 
-    function __construct($name, $date=null)
+    public function __construct(string $name, string $date = '')
     {
         $this->name = $name;
         $date = str_replace('.', '-', $date);
 
-        if ($date == null)
-        {
-            $this->date = strtotime('today');
-        }
-        else
-        {
-            $this->date = strtotime($date);
-        }
+        $this->date = ($date === '') ? strtotime('today') : strtotime($date);
     }
 
-    function addPlayer($player)
+    final public function addPlayer(Player $player): Tournament
     {
         $this->players[] = $player;
         return $this;
     }
 
-    function createPairs()
+    final public function createPairs(): array
     {
         $players = $this->players;
+        $rounds = Array();
 
-        if (count($players) % 2 == 1)
+        if (count($players) % 2 === 1)
         {
             $players[] = new Player('Bye');
         }
 
-        $away = array_splice($players,(count($players)/2));
+        $away = array_splice($players, count($players) / 2);
         $home = $players;
 
-        for ($i=0; $i < count($home)+count($away) - 1; $i++)
+        for ($i = 0; $i < count($home) + count($away) - 1; $i++)
         {
-            for ($j=0; $j<count($home); $j++)
+            for ($j = 0, $jMax = count($home); $j < $jMax; $j++)
             {
-                $round[$i][$j]['Home']=$home[$j];
-                $round[$i][$j]['Away']=$away[$j];
+                $rounds[$i][$j]['Home'] = $home[$j];
+                $rounds[$i][$j]['Away'] = $away[$j];
             }
-            if(count($home)+count($away)-1 > 2)
+
+            if (count($home) + count($away) - 1 > 2)
             {
                 $temp = array_splice($home, 1, 1);
                 array_unshift($away, array_shift($temp));
@@ -53,35 +48,22 @@ Class Tournament
             }
         }
 
-        $this->printRound($round);
-        return $round;
+        $this->printRounds($rounds);
+        return $rounds;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getDate(): string
-    {
-        return date('d.m.Y', $this->date);
-    }
-
-    public function getPlayers(): array
-    {
-        return $this->players;
-    }
-
-    protected function printRound(array $rounds): void
+    final public function printRounds(array $rounds): void
     {
         foreach ($rounds as $round => $games)
         {
-            echo "$this->name, " . date('d.m.Y', strtotime('+' . $round + 1 . ' days', $this->date)) . '<br>';
-            echo 'Round: ' . ($round + 1) . '<br>';
+            ++$round;
+
+            echo "$this->name, " . date('d.m.Y', strtotime("+$round days", $this->date)) . '<br>';
+            echo "Round: $round<br>";
 
             foreach ($games as $play)
             {
-                if ('Bye' != $play['Home']->getName() and 'Bye' != $play['Away']->getName())
+                if ('Bye' !== $play['Home']->getName() && 'Bye' !== $play['Away']->getName())
                 {
                     echo $play['Home']->getName() . ' - ' . $play['Away']->getName() . '<br>';
                 }
@@ -89,5 +71,20 @@ Class Tournament
 
             echo '<br>';
         }
+    }
+
+    final public function getName(): string
+    {
+        return $this->name;
+    }
+
+    final public function getDate(): string
+    {
+        return date('d.m.Y', $this->date);
+    }
+
+    final public function getPlayers(): array
+    {
+        return $this->players;
     }
 }

@@ -1,26 +1,26 @@
 <?php
 Class Player
 {
-    private $name;
-    private $city;
+    private string $name;
+    private string $city;
 
-    function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    function setCity($city)
+    final public function setCity(string $city): Player
     {
         $this->city = $city;
         return $this;
     }
 
-    public function getName()
+    final public function getName(): string
     {
         return $this->name;
     }
 
-    public function getCity()
+    final public function getCity(): string
     {
         return $this->city;
     }
